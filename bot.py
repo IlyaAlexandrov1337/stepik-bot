@@ -6,16 +6,15 @@ import os
 import redis
 
 token = os.environ['TELEGRAM_TOKEN']
-redis_url = os.environ.get('REDIS_URL')
 MAIN_STATE = 'main'
 QST_STATE = 'question'
 LVL_STATE = 'level'
-if redis_url is None:
+if os.environ.get('REDIS_URL') is None:
     states = json.load(open('data/states.json', 'r', encoding='utf-8'))
     results = json.load(open('data/results.json', 'r', encoding='utf-8'))
     level = json.load(open('data/level.json', 'r', encoding='utf-8'))
 else:
-    redis_db = redis.from_url(redis_url)
+    redis_db = redis.from_url(os.environ.get('REDIS_URL'))
     raw_states = redis_db.get('states')
     raw_results = redis_db.get('results')
     raw_level = redis_db.get('level')
@@ -35,11 +34,10 @@ bot = telebot.TeleBot(token)
 
 
 def change_data(data, strdata):
-    if redis_url is None:
+    if os.environ.get('REDIS_URL') is None:
         json.dump(data, open('data/{}.json'.format(strdata), 'w', encoding='utf-8'), indent=2)
     else:
-        redis_data = redis.from_url(redis_url)
-        redis_data.set(strdata, json.dumps(data))
+        redis.from_url(os.environ.get('REDIS_URL')).set(strdata, json.dumps(data))
 
 
 @bot.message_handler(func=lambda message: True)
