@@ -10,6 +10,7 @@ redis_url = os.environ.get('REDIS_URL')
 MAIN_STATE = 'main'
 QST_STATE = 'question'
 LVL_STATE = 'level'
+print(redis_url)
 if redis_url is None:
     states = json.load(open('data/states.json', 'r', encoding='utf-8'))
     results = json.load(open('data/results.json', 'r', encoding='utf-8'))
@@ -82,7 +83,7 @@ def main_handler(message):
         bot.send_message(user_id, 'Счёт обнулён', reply_markup=k.keyboard_main)
         change_data(results, 'results')
     elif message.text == 'Привет':
-        bot.send_message(user_id, 'Ну привет!'+str(redis_db.get('results')), reply_markup=k.keyboard_main)
+        bot.send_message(user_id, 'Ну привет!', reply_markup=k.keyboard_main)
     elif message.text == 'Выбрать сложность':
         bot.send_message(user_id, 'Уровень сложности', reply_markup=k.keyboard_lvl)
         states[user_id] = LVL_STATE
