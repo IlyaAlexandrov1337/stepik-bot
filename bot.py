@@ -39,7 +39,7 @@ def change_data(data, strdata):
         json.dump(data, open('data/{}.json'.format(strdata), 'w', encoding='utf-8'), indent=2)
     else:
         redis_data = redis.from_url(redis_url)
-        redis_data.set('{}'.format(strdata), json.dumps(data))
+        redis_data.set(strdata, json.dumps(data))
 
 
 @bot.message_handler(func=lambda message: True)
