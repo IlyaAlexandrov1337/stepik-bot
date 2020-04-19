@@ -6,15 +6,16 @@ import os
 import redis
 
 token = os.environ['TELEGRAM_TOKEN']
+redis_url = os.environ.get('REDIS_URL')
 MAIN_STATE = 'main'
 QST_STATE = 'question'
 LVL_STATE = 'level'
-if os.environ.get('REDIS_URL') is None:
+if redis_url is None:
     states = json.load(open('data/states.json', 'r', encoding='utf-8'))
     results = json.load(open('data/results.json', 'r', encoding='utf-8'))
     level = json.load(open('data/level.json', 'r', encoding='utf-8'))
 else:
-    redis_db = redis.from_url(os.environ.get('REDIS_URL'))
+    redis_db = redis.from_url(redis_url)
     raw_states = redis_db.get('states')
     raw_results = redis_db.get('results')
     raw_level = redis_db.get('level')
@@ -34,10 +35,12 @@ bot = telebot.TeleBot(token)
 
 
 def change_data(data, strdata):
-    if os.environ.get('REDIS_URL') is None:
+    if redis_url is None:
         json.dump(data, open('data/{}.json'.format(strdata), 'w', encoding='utf-8'), indent=2)
     else:
-        redis.from_url(os.environ.get('REDIS_URL')).set(strdata, json.dumps(data))
+        redis_data = redis.from_url(redis_url)
+        redis_data.set(strdata, json.dumps(data))
+
 
 
 @bot.message_handler(func=lambda message: True)
@@ -79,7 +82,7 @@ def main_handler(message):
         bot.send_message(user_id, 'Счёт обнулён', reply_markup=k.keyboard_main)
         change_data(results, 'results')
     elif message.text == 'Привет':
-        bot.send_message(user_id, 'Ну привет!', reply_markup=k.keyboard_main)
+        bot.send_message(user_id, 'Ну привет!'+str(redis_db.get('results')), reply_markup=k.keyboard_main)
     elif message.text == 'Выбрать сложность':
         bot.send_message(user_id, 'Уровень сложности', reply_markup=k.keyboard_lvl)
         states[user_id] = LVL_STATE
