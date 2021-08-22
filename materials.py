@@ -17,4 +17,4 @@ def q_and_a(level):
     m[q] = {True: a[0]}
     a.pop(0)
     m[q][False] = a
-    return m
+    return m 
