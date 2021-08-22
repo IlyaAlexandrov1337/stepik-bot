@@ -25,3 +25,4 @@ def keyboard_qst(ans):
     shuffle(array)
     keyboard.add(*array)
     return keyboard
+ 
